@@ -37,7 +37,7 @@ export default new Vuex.Store({
 
     // Async commits
     actions: {
-        search({ commit }, { term }) {
+        search({ commit }, { term, nb }) {
             commit('index', 0);
 
             const url = 'https://pixabay.com/api/';
@@ -45,6 +45,7 @@ export default new Vuex.Store({
             const params = {
                 key,
                 q: term,
+                per_page: nb,
                 image_type: 'photo',
                 orientation: 'horizontal',
                 order: 'latest',
