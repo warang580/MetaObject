@@ -1,0 +1,34 @@
+Cas d'utilisation (basique) : création d'un bouton avec un compteur
+===================================================================
+
+Je veux un bouton qui affiche le nombre de fois qu'il a été cliqué
+
+1: j'ai besoin d'un bouton qui va afficher 0
+2: je veux qu'il détecte le clic
+3: incrémenter le compteur
+4: le bouton affiche le compteur
+
+1 => je modifie le template de mon composant actuel (page)
+2 => je rajoute un hook au clic pour qu'il appelle une action
+3 => l'action en question appelle la mutation qui modifie le state (compteur)
+4 => je modifie le template pour afficher l'état actuel du compteur (getter)
+
+ça implique que mon composant :
+    - a un template dynamique
+    - il est fortement dépendant du Store
+    - ses méthodes sont "overwritables" pour appeller celles du store
+        (on pourrait envisager un système de message qui permet de rendre tout cela dynamique, chaque composant pouvant écouter/émettre certains messages et tout cela serait géré au niveau du store)
+
+    - le composant Meta qui permet de gérer tout ça ne doit pas changer structurellement après instantiation
+
+ça implique que le store :
+    - gère l'état complet de chaque instance de composant
+    - on peut envisager que c'est lui qui construise l'état initial des instances d'un type de composant en particulier et qui lui dit comment se comporter dans tous les cas
+    - permette de rajouter à la volée des autres méthodes pour pouvoir enrichir les composants/instances de nouvelles fonctionnalités
+
+(cf. papier sur les objets dynamiques)
+
+la question, c'est comment gére t'on les différentes instances (création, déplacement, etc.) ?
+et les composants
+
+bon pour le moment on peut supposer que toutes ces choses existent pour ne travailler que leur interaction pour l'instant

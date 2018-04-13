@@ -8,11 +8,7 @@ export default new Vuex.Store({
     strict: true,
 
     state: {
-        loader: false,
-
-        images: [],
-
-        index: 0,
+        template: "<div class='meta'>Meta</div>",
     },
 
     getters: {

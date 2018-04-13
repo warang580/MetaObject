@@ -1,11 +1,22 @@
 <template>
     <div class="container">
-        Index
+        <button>0</button>
+
+        <meta-component
+
+        ></meta-component>
     </div>
 </template>
 
 <script>
+import meta from '@/components/Meta';
+
 export default {
+    components: {'meta-component': meta},
+
+    created() {
+    },
+
     data() {
         return {};
     },
