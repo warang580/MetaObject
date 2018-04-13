@@ -16,77 +16,14 @@ export default new Vuex.Store({
     },
 
     getters: {
-        image(state) {
-            return state.images[state.index];
-        },
-
-        count(state) {
-            return state.images ? state.images.length : 0;
-        },
-
-        preview(state, getters) {
-            const image = getters.image;
-
-            if (!image) {
-                return '';
-            }
-
-            return image.webformatURL;
-        },
+        // getter(state, getters)
     },
 
-    // Async commits
     actions: {
-        search({ commit }, { term, nb }) {
-            commit('index', 0);
-
-            const url = 'https://pixabay.com/api/';
-            const key = '8658264-1f077cd1cf64865031ea18988';
-            const params = {
-                key,
-                q: term,
-                per_page: nb,
-                image_type: 'photo',
-                orientation: 'horizontal',
-                order: 'latest',
-                editors_choice: true,
-            };
-
-            commit('loader', true);
-            axios.get(url, { params }).then((response) => {
-                commit('images', response.data.hits);
-                commit('loader', false);
-            });
-        },
-
-        move({ state, commit }, { offset }) {
-            commit('index', state.index + offset);
-        },
+        // action({ state, commit }, payload)
     },
 
-    // Sync changes
     mutations: {
-        loader(state, loading) {
-            state.loader = loading;
-        },
-
-        images(state, images) {
-            state.images = images;
-        },
-
-        index(state, index) {
-            const max = Math.max(0, state.images.length - 1);
-            let i = index;
-
-            if (i < 0) {
-                i = 0;
-            }
-
-            if (i > max) {
-                i = max;
-            }
-
-            state.index = i;
-        },
+        // mutation(state, payload)
     },
 });

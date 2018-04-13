@@ -3,3 +3,6 @@
 /dist/
 /*.js
 /test/unit/coverage/
+
+# Disabling linting for now
+src/
