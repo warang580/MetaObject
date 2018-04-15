@@ -1,5 +1,6 @@
 <script>
 import Vue from 'vue';
+import { mapGetters } from 'vuex';
 
 export default {
     props: {
@@ -35,7 +36,7 @@ export default {
         },
 
         instance() {
-            return this.$store.state.instances[this.for][this.id];
+            return this.getInstance()(this.for, this.id);
         },
 
         component() {
@@ -53,6 +54,10 @@ export default {
         get(name) {
             return this.instance.data[name];
         },
+
+        ...mapGetters({
+            getInstance: 'instance',
+        }),
 
         send(message, payload) {
             this.$store.dispatch('send', {
