@@ -12,28 +12,24 @@ export default new Vuex.Store({
     state: {
         components: {
             counter: {
-                component: {
-                    template: `<div class='meta'>
-                        <button class="button is-info" @click="send('increment')" v-text="get('count')"></button>
-                    </div>`,
+                template: `<div class='meta'>
+                    <button class="button is-info" @click="send('increment')" v-text="get('count', -1)"></button>
+                </div>`,
 
-                    actions: {
-                        increment({commit}, payload) {
-                            commit('increment');
-                        },
-                    },
-
-                    mutations: {
-                        increment(state) {
-                            state.count++;
-                        },
+                actions: {
+                    increment({commit}, payload) {
+                        commit('increment');
                     },
                 },
 
-                instance: {
-                    data: {
-                        count: 0,
+                mutations: {
+                    increment(state) {
+                        state.count++;
                     },
+                },
+
+                data: {
+                    count: 0,
                 },
             },
         },
@@ -43,9 +39,21 @@ export default new Vuex.Store({
 
     // getter(state, getters)
     getters: {
+        component(state, getters) {
+            return (name) => {
+                return find(state.components, `${name}`, {});
+            };
+        },
+
         instance(state, getters) {
             return (name, id) => {
                 return find(state.instances, `${name}.${id}`, {});
+            };
+        },
+
+        instanceData(state, getters) {
+            return (name, id, key, def) => {
+                return find(state.instances, `${name}.${id}.${key}`, def);
             };
         },
     },
@@ -54,7 +62,7 @@ export default new Vuex.Store({
     actions: {
         send(context, { componentName, instanceId, message, payload })
         {
-            let component = context.state.components[componentName].component;
+            let component = context.state.components[componentName];
             let instance  = context.state.instances[componentName][instanceId];
             let action    = component.actions[message];
 
@@ -95,7 +103,9 @@ export default new Vuex.Store({
             }
 
             let component = state.components[componentName];
-            let instance  = Object.assign({}, component.instance);
+            let instance  = Object.assign({}, component.data);
+
+            console.log("create", `${componentName}#${instanceId}`, instance);
 
             state.instances[componentName][instanceId] = instance;
         },
@@ -103,11 +113,13 @@ export default new Vuex.Store({
         // Update the state of an instance
         update(state, {componentName, instanceId, instance, callback}) {
             // @TODO: remove .data ?
-            let currentInstance = state.instances[componentName][instanceId].data;
+            let currentInstance = state.instances[componentName][instanceId];
 
             callback(currentInstance);
 
-            state.instances[componentName][instanceId].data = currentInstance;
+            console.log("update", `${componentName}#${instanceId}`, currentInstance);
+
+            state.instances[componentName][instanceId] = currentInstance;
         },
     },
 });
