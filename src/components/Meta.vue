@@ -20,6 +20,10 @@ export default {
 
     created() {
         this.$store.commit('create', this);
+
+        this.$bus.$emit(this.key, {
+            method: 'created',
+        });
     },
 
     render(h) {
@@ -31,6 +35,10 @@ export default {
     },
 
     computed: {
+        key() {
+            return `${this.for}#${this.id}`;
+        },
+
         id() {
             return this._uid;
         },

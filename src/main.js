@@ -8,7 +8,9 @@ import store from './store';
 import './assets/sass/main.scss';
 
 Vue.config.productionTip = false;
+
 Vue.prototype.$http = axios;
+Vue.prototype.$bus  = new Vue();
 
 /* eslint-disable no-new */
 new Vue({
