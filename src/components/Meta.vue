@@ -38,16 +38,6 @@ export default {
             return this.$store.state.instances[this.for][this.id];
         },
 
-        template() {
-            let template = this.component.template;
-
-            if (! template) {
-                return `<div>No template found for '${this.for}'</div>`;
-            }
-
-            return template;
-        },
-
         component() {
             let component = this.$store.state.components[this.for];
 
@@ -76,13 +66,11 @@ export default {
 
         // @TODO: don't access it outside
         render() {
-            if (! this.template) {
-                this.rendering = null;
-                return;
-            }
+            let defTemplate = `<div>No template found for '${this.for}'</div>`
+            let template    = this.component.template || defTemplate;
 
             // @TODO: catch template compiling errors
-            let compiled       = Vue.compile(this.template);
+            let compiled       = Vue.compile(template);
             let renderStatic   = compiled.staticRenderFns;
             let templateRender = compiled.render;
 

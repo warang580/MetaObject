@@ -40,13 +40,7 @@ export default new Vuex.Store({
     },
 
     // getter(state, getters)
-    getters: {
-        instance(state, getters) {
-            return (componentName, instanceId) => {
-                return state.instances[componentName][instanceId];
-            };
-        },
-    },
+    getters: {},
 
     // action({ state, commit }, payload)
     actions: {
@@ -57,22 +51,18 @@ export default new Vuex.Store({
             let action    = component.actions[message];
 
             // Call component method with correct context
-            console.log("send", message, component, instance, context);
+            console.log("send", `to: ${componentName}#${instanceId}`, `msg: ${message}`, "args:", payload);
 
             let subContext = Object.assign({}, context);
 
             subContext.dispatch = (actionName, subPayload) => {
                 let subAction = component.actions[actionName];
 
-                console.log("trying dispatch", actionName, subPayload);
-
                 subAction(subContext, subPayload);
             };
 
             subContext.commit = (mutationName, subPayload) => {
                 let subMutation = component.mutations[mutationName];
-
-                console.log("trying commit", mutationName, subPayload);
 
                 context.commit('update', {
                     componentName,
