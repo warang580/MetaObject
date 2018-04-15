@@ -1,11 +1,10 @@
 <template>
-    <div class="container">
-        <button>0</button>
-
-        <meta-component
-
-        ></meta-component>
-    </div>
+    <section class="section">
+        <div class="container">
+            <meta-component for="counter"></meta-component>
+            <!-- <meta-component for="light"></meta-component> -->
+        </div>
+    </section>
 </template>
 
 <script>
@@ -14,8 +13,7 @@ import meta from '@/components/Meta';
 export default {
     components: {'meta-component': meta},
 
-    created() {
-    },
+    created() {},
 
     data() {
         return {};
