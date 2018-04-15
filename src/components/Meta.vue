@@ -40,24 +40,20 @@ export default {
         },
 
         component() {
-            let component = this.$store.state.components[this.for];
-
-            if (! component) {
-                return {};
-            }
-
-            return component.component;
+            return this.getComponent()(this.for);
         },
     },
 
     methods: {
-        get(name) {
-            return this.instance.data[name];
-        },
-
         ...mapGetters({
-            getInstance: 'instance',
+            getComponent:    'component',
+            getInstance:     'instance',
+            getInstanceData: 'instanceData',
         }),
+
+        get(name, def) {
+            return this.getInstanceData()(this.for, this.id, name, def);
+        },
 
         send(message, payload) {
             this.$store.dispatch('send', {
