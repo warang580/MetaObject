@@ -15,11 +15,12 @@ export default new Vuex.Store({
             stage: {
                 template: `<div class='stage'>
                     Total: <span v-text="get('total')"></span>
-                    <meta-component @changed="send('update', {index: 0, value: $event})" for="counter"></meta-component>
-                    <meta-component @changed="send('update', {index: 1, value: $event})" for="counter"></meta-component>
+                    <meta-component v-for="n in get('nb')" :key="n" @changed="send('update', {index: n, value: $event})" for="counter"></meta-component>
+                    <meta-component for="light"></meta-component>
                 </div>`,
 
                 state: {
+                    nb: 5,
                     sub: [0, 0],
                 },
 
@@ -42,10 +43,42 @@ export default new Vuex.Store({
                 },
             },
 
+            light: {
+                template: `<button @click="send('toggle')" :class="get('css')">
+                    <span v-html="get('html')"></span>
+                </button>`,
+
+                state: {
+                    on: false,
+                },
+
+                actions: {
+                    toggle({commit}, payload) {
+                        commit('toggle', payload);
+                    },
+                },
+
+                mutations: {
+                    toggle(state) {
+                        state.on = ! state.on;
+                    },
+                },
+
+                getters: {
+                    html(state, getters) {
+                        return state.on ? "<i class='fa fa-star'></i>" : "<i class='fa fa-bolt'></i>";
+                    },
+
+                    css(state, getters) {
+                        return state.on ? "button is-warning" : "button";
+                    },
+                },
+            },
+
             counter: {
-                template: `<span class='counter'>
+                template: `<div class='counter'>
                     <button :class="get('css', 'button is-danger')" @click="send('increment')" v-text="get('count', -1)"></button><button class="button is-danger" v-if="get('hasClicked')" @click="send('reset')">X</button>
-                </span>`,
+                </div>`,
 
                 state: {
                     count: 0,
@@ -185,7 +218,7 @@ export default new Vuex.Store({
 
             subContext.emit = (eventName, subPayload) => {
                 let instanceEvents = context.state.events[instanceKey];
-                
+
                 instanceEvents.$emit(eventName, subPayload);
             },
 
