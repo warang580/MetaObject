@@ -14,12 +14,16 @@ export default new Vuex.Store({
             stage: {
                 template: `<div class='stage'>
                     <meta-component for="counter"></meta-component>
+                    <meta-component for="counter"></meta-component>
+                    <meta-component for="counter"></meta-component>
+                    <meta-component for="counter"></meta-component>
+                    <meta-component for="counter"></meta-component>
                 </div>`,
             },
 
             counter: {
                 template: `<span class='counter'>
-                    <button :class="get('css', 'button is-danger')" @click="send('increment')" v-text="get('count', -1)"></button>
+                    <button :class="get('css', 'button is-danger')" @click="send('increment')" v-text="get('count', -1)"></button><button class="button is-danger" @click="send('reset')">X</button>
                 </span>`,
 
                 state: {
