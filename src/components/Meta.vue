@@ -1,6 +1,7 @@
 <script>
 import Vue from 'vue';
 import { mapGetters } from 'vuex';
+import EventBus from '@/events/index';
 
 // Anonymous function so it's not usable by user
 let _getter = function($store, name) {

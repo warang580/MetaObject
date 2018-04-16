@@ -3,6 +3,7 @@ import Vuex from 'vuex';
 import axios from 'axios';
 
 import {find} from '@/utils';
+import EventBus from '@/events/index';
 
 Vue.use(Vuex);
 
@@ -36,7 +37,7 @@ export default new Vuex.Store({
 
                 mutations: {
                     update(state, { index, value }) {
-                        state.sub[index] = value;
+                        Vue.set(state.sub, index, value);
                     },
                 },
             },
@@ -88,7 +89,11 @@ export default new Vuex.Store({
             },
         },
 
+        // Instances data
         instances: {},
+
+        // Instances events/bus
+        events: {},
     },
 
     // getter(state, getters)
@@ -179,9 +184,9 @@ export default new Vuex.Store({
             };
 
             subContext.emit = (eventName, subPayload) => {
-                // @TODO: store.instances = vue instance, store.data = vue instance data
-                // so i can do .instances[key].$emit
-                console.log("emit", eventName, subPayload);
+                let instanceEvents = context.state.events[instanceKey];
+                
+                instanceEvents.$emit(eventName, subPayload);
             },
 
             // We call the action [counter.increment] with our context
@@ -213,6 +218,11 @@ export default new Vuex.Store({
             let component   = state.components[componentName];
             let instance    = Object.assign({}, component.state);
             let instanceKey = `${componentName}#${instanceId}`;
+
+            Vue.set(state.events, instanceKey, {
+                $emit:   self.$emit,
+                _events: self._events,
+            });
 
             Vue.set(state.instances, instanceKey, instance);
         },
