@@ -22,16 +22,15 @@
 
 <script>
 export default {
-    created() {},
+    created() {
+        this.template        = this.$store.state.components.stage.template;
+        this.counterTemplate = this.$store.state.components.counter.template;
+    },
 
     data() {
         return {
-            template: `<div class='stage'>
-    <meta-component for="counter"></meta-component>
-</div>`,
-            counterTemplate: `<div class='meta'>
-    <button class="button is-info" @click="send('increment')" v-text="get('count', -1)"></button>
-</div>`,
+            template: "",
+            counterTemplate: "",
         };
     },
 
@@ -41,7 +40,6 @@ export default {
 
             component.template = newTemplate;
 
-            console.log("save");
             this.$store.dispatch('update', {componentName, component});
         },
     },

@@ -27,6 +27,10 @@ export default new Vuex.Store({
                 },
 
                 actions: {
+                    reset({commit}, payload) {
+                        commit('reset');
+                    },
+
                     increment({commit}, payload) {
                         commit('increment');
                     },
@@ -35,6 +39,10 @@ export default new Vuex.Store({
                 mutations: {
                     increment(state) {
                         state.count++;
+                    },
+
+                    reset(state) {
+                        state.count = 0;
                     },
                 },
 
