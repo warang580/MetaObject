@@ -1,7 +1,7 @@
 <template>
     <div id="playground">
         <section class="section">
-            <div class="container">
+            <div id="stage" class="container">
                 <meta-component for="stage"></meta-component>
             </div>
         </section>

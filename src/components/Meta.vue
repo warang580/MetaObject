@@ -2,6 +2,13 @@
 import Vue from 'vue';
 import { mapGetters } from 'vuex';
 
+// Anonymous function so it's not usable by user
+let _getter = function($store, name) {
+    let args = Array.from(arguments).slice(2);
+
+    return $store.getters[name](...args);
+}
+
 export default {
     props: {
         // The component we're "tranforming" into
@@ -40,27 +47,20 @@ export default {
         },
 
         instance() {
-            let instanceData     = this.getInstance()(this.key);
-            let instanceComputed = this.getComputed()(this.for, this.id);
+            let data = _getter(this.$store, 'instance', this.key);
+            let comp = _getter(this.$store, 'computed', this.for, this.id);
 
-            return Object.assign(instanceData, instanceComputed);
+            return Object.assign(data, comp);
         },
 
         component() {
-            return this.getComponent()(this.for);
+            return _getter(this.$store, 'component', this.for);
         },
     },
 
     methods: {
-        ...mapGetters({
-            getComponent: 'component',
-            getInstance:  'instance',
-            getData:      'find',
-            getComputed:  'computed',
-        }),
-
         get(name, def) {
-            return this.getData()(this.for, this.id, name, def);
+            return _getter(this.$store, 'find', this.for, this.id, name, def);
         },
 
         send(message, payload) {
@@ -72,29 +72,27 @@ export default {
                 payload,
             });
         },
-
-        // @TODO: don't access it outside
-        render() {
-            let defTemplate = `<div>No template found for '${this.for}'</div>`
-            let template    = this.component.template || defTemplate;
-
-            // @TODO: catch template compiling errors
-            let compiled       = Vue.compile(template);
-            let renderStatic   = compiled.staticRenderFns;
-            let templateRender = compiled.render;
-
-            // Update render
-            this._staticTrees = [];
-            this.rendering    = templateRender;
-            this.$options.staticRenderFns = renderStatic;
-        },
     },
 
     watch: {
         'component.template': {
             immediate: true,
             handler() {
-                this.render();
+                // Rendering
+
+                // Find template
+                let defTemplate = `<div>No template found for '${this.for}'</div>`
+                let template    = this.component.template || defTemplate;
+
+                // Compile template
+                let compiled       = Vue.compile(template);
+                let renderStatic   = compiled.staticRenderFns;
+                let templateRender = compiled.render;
+
+                // Update render
+                this._staticTrees = [];
+                this.rendering    = templateRender;
+                this.$options.staticRenderFns = renderStatic;
             },
         },
     },

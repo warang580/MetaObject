@@ -18,9 +18,9 @@ export default new Vuex.Store({
             },
 
             counter: {
-                template: `<div class='meta'>
+                template: `<span class='counter'>
                     <button :class="get('css', 'button is-danger')" @click="send('increment')" v-text="get('count', -1)"></button>
-                </div>`,
+                </span>`,
 
                 state: {
                     count: 0,

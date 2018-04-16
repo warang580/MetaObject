@@ -1,11 +1,11 @@
-import Vue from 'vue';
+import Vue   from 'vue';
 import axios from 'axios';
 
-import App from './App';
+import App    from './App';
 import router from './router';
-import store from './store';
+import store  from './store';
 
-import meta from '@/components/Meta';
+import meta from './components/Meta';
 
 import './assets/sass/main.scss';
 
