@@ -39,8 +39,12 @@ export default new Vuex.Store({
                 },
 
                 getters: {
+                    hasClicked(state, getters) {
+                        return state.count > 0;
+                    },
+
                     css(state, getters) {
-                        if (state.count > 0) {
+                        if (getters.hasClicked(state, getters)) {
                             return "button is-info";
                         }
 
@@ -69,7 +73,7 @@ export default new Vuex.Store({
             };
         },
 
-        instanceData(state, getters) {
+        find(state, getters) {
             return (name, id, path, def) => {
                 let key = `${name}#${id}`;
 
@@ -84,6 +88,20 @@ export default new Vuex.Store({
 
                 // Trying in getters
                 return getter(data, getters);
+            };
+        },
+
+        computed(state) {
+            return (name, id) => {
+                let key     = `${name}#${id}`;
+                let getters = find(state.components, `${name}.getters`, {});
+                let data    = find(state.instances, key, {});
+
+                return Object.entries(getters).reduce((computed, [name, cb]) => {
+                    computed[name] = cb(data, getters);
+
+                    return computed;
+                }, {});
             };
         },
     },
@@ -156,7 +174,6 @@ export default new Vuex.Store({
         },
 
         updateComponent(state, {componentName, component}) {
-            console.log("updateComponent", componentName, component);
             Vue.set(state.components, componentName, component);
         },
 

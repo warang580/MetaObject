@@ -40,7 +40,10 @@ export default {
         },
 
         instance() {
-            return this.getInstance()(this.key);
+            let instanceData     = this.getInstance()(this.key);
+            let instanceComputed = this.getComputed()(this.for, this.id);
+
+            return Object.assign(instanceData, instanceComputed);
         },
 
         component() {
@@ -50,13 +53,14 @@ export default {
 
     methods: {
         ...mapGetters({
-            getComponent:    'component',
-            getInstance:     'instance',
-            getInstanceData: 'instanceData',
+            getComponent: 'component',
+            getInstance:  'instance',
+            getData:      'find',
+            getComputed:  'computed',
         }),
 
         get(name, def) {
-            return this.getInstanceData()(this.for, this.id, name, def);
+            return this.getData()(this.for, this.id, name, def);
         },
 
         send(message, payload) {
