@@ -9,11 +9,7 @@
 </template>
 
 <script>
-import meta from '@/components/Meta';
-
 export default {
-    components: {'meta-component': meta},
-
     created() {},
 
     data() {
