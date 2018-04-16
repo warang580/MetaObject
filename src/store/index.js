@@ -13,17 +13,37 @@ export default new Vuex.Store({
         components: {
             stage: {
                 template: `<div class='stage'>
-                    <meta-component for="counter"></meta-component>
-                    <meta-component for="counter"></meta-component>
-                    <meta-component for="counter"></meta-component>
-                    <meta-component for="counter"></meta-component>
-                    <meta-component for="counter"></meta-component>
+                    Total: <span v-text="get('total')"></span>
+                    <meta-component @changed="send('update', {index: 0, value: $event})" for="counter"></meta-component>
+                    <meta-component @changed="send('update', {index: 1, value: $event})" for="counter"></meta-component>
                 </div>`,
+
+                state: {
+                    sub: [0, 0],
+                },
+
+                getters: {
+                    total(state) {
+                        return state.sub.reduce((r, s) => r + s, 0);
+                    },
+                },
+
+                actions: {
+                    update({ commit }, payload) {
+                        commit('update', payload);
+                    },
+                },
+
+                mutations: {
+                    update(state, { index, value }) {
+                        state.sub[index] = value;
+                    },
+                },
             },
 
             counter: {
                 template: `<span class='counter'>
-                    <button :class="get('css', 'button is-danger')" @click="send('increment')" v-text="get('count', -1)"></button><button class="button is-danger" @click="send('reset')">X</button>
+                    <button :class="get('css', 'button is-danger')" @click="send('increment')" v-text="get('count', -1)"></button><button class="button is-danger" v-if="get('hasClicked')" @click="send('reset')">X</button>
                 </span>`,
 
                 state: {
@@ -31,12 +51,14 @@ export default new Vuex.Store({
                 },
 
                 actions: {
-                    reset({commit}, payload) {
+                    reset({state, commit, emit}, payload) {
                         commit('reset');
+                        emit('changed', state.count);
                     },
 
-                    increment({commit}, payload) {
+                    increment({state, commit, emit}, payload) {
                         commit('increment');
+                        emit('changed', state.count);
                     },
                 },
 
@@ -67,8 +89,6 @@ export default new Vuex.Store({
         },
 
         instances: {},
-
-        compiling: false,
     },
 
     // getter(state, getters)
@@ -118,47 +138,70 @@ export default new Vuex.Store({
         },
     },
 
-    // action({ state, commit }, payload)
     actions: {
+        // Lookup for a given message in an instance
+        // [Example: execute "increment" in a "counter" instance]
         send(context, { componentName, instanceId, message, payload })
         {
-            let component = context.state.components[componentName];
-            let instance  = context.state.instances[componentName][instanceId];
-            let action    = component.actions[message];
+            console.log("send:", message, `to: ${componentName}#${instanceId}`, "args:", payload);
 
-            // Call component method with correct context
-            console.log("sendTo:", `${componentName}#${instanceId}`, `msg: ${message}`, "args:", payload);
+            // Get component action
+            // [counter.increment callback]
+            let component   = context.state.components[componentName];
+            let action      = component.actions[message];
+            let instanceKey = `${componentName}#${instanceId}`;
+            let instance    = context.state.instances[instanceKey];
 
+            // Call component method with overwritten context
             let subContext = Object.assign({}, context);
 
+            subContext.state = instance;
+
+            // Dispatching another command
             subContext.dispatch = (actionName, subPayload) => {
                 let subAction = component.actions[actionName];
 
+                // = Calling directly the function with the same arguments
                 subAction(subContext, subPayload);
             };
 
+            // Committing something
             subContext.commit = (mutationName, subPayload) => {
-                let subMutation = component.mutations[mutationName];
+                let callback = component.mutations[mutationName];
 
-                context.commit('update', {
+                // = Swapping state of an instance
+                context.commit('swap', {
                     componentName,
                     instanceId,
-                    instance,
-                    callback: subMutation,
+                    callback,
+                    payload: subPayload,
                 });
             };
 
+            subContext.emit = (eventName, subPayload) => {
+                // @TODO: store.instances = vue instance, store.data = vue instance data
+                // so i can do .instances[key].$emit
+                console.log("emit", eventName, subPayload);
+            },
+
+            // We call the action [counter.increment] with our context
             action(subContext, payload);
         },
 
-        update({ commit }, {componentName, component})
-        {
-            commit('updateComponent', {componentName, component});
+        // Update component
+        update({ commit }, {componentName, component}) {
+            // @NOTE: using action if case of expanding code / logs
+            commit('update', {componentName, component});
         },
     },
 
     mutations: {
-        // Create an instance of a component
+        // Update component `component = {...}`
+        update(state, {componentName, component}) {
+            Vue.set(state.components, componentName, component);
+        },
+
+        // Create an instance of a component `new component`
         create(state, self) {
             let componentName = self.for;
             let instanceId    = self.id;
@@ -167,30 +210,22 @@ export default new Vuex.Store({
                 state.instances[componentName] = {};
             }
 
-            let component = state.components[componentName];
-            let instance  = Object.assign({}, component.state);
-
+            let component   = state.components[componentName];
+            let instance    = Object.assign({}, component.state);
             let instanceKey = `${componentName}#${instanceId}`;
 
             Vue.set(state.instances, instanceKey, instance);
         },
 
-        // Update the state of an instance
-        update(state, {componentName, instanceId, instance, callback}) {
+        // Swap instance data with callback(data) `swap! instance`
+        swap(state, {componentName, instanceId, callback, payload }) {
             let instanceKey     = `${componentName}#${instanceId}`;
             let currentInstance = state.instances[instanceKey];
 
-            callback(currentInstance);
+            // Changing currentInstance by ref, no return needed
+            callback(currentInstance, payload);
 
             Vue.set(state.instances, instanceKey, currentInstance);
-        },
-
-        updateComponent(state, {componentName, component}) {
-            Vue.set(state.components, componentName, component);
-        },
-
-        compiling(state, status) {
-            state.compiling = status;
         },
     },
 });

@@ -27,6 +27,8 @@ export default {
 
     created() {
         this.$store.commit('create', this);
+
+        this.emit('created', this.key);
     },
 
     render(h) {
@@ -63,11 +65,22 @@ export default {
             return _getter(this.$store, 'find', this.for, this.id, name, def);
         },
 
-        send(message, payload) {
-            this.$store.dispatch('send', {
-                componentName:  this.for,
-                instanceId:     this.id,
+        emit(message, payload) {
+            this.$emit(message, payload);
+        },
 
+        send(message, payload, componentName, instanceId) {
+            if (! componentName) {
+                componentName = this.for;
+            }
+
+            if (! instanceId) {
+                instanceId = this.id;
+            }
+
+            this.$store.dispatch('send', {
+                componentName,
+                instanceId,
                 message,
                 payload,
             });
