@@ -19,8 +19,12 @@ export default new Vuex.Store({
 
             counter: {
                 template: `<div class='meta'>
-                    <button class="button is-info" @click="send('increment')" v-text="get('count', -1)"></button>
+                    <button :class="get('css', 'button is-danger')" @click="send('increment')" v-text="get('count', -1)"></button>
                 </div>`,
+
+                state: {
+                    count: 0,
+                },
 
                 actions: {
                     increment({commit}, payload) {
@@ -34,8 +38,14 @@ export default new Vuex.Store({
                     },
                 },
 
-                data: {
-                    count: 0,
+                getters: {
+                    css(state, getters) {
+                        if (state.count > 0) {
+                            return "button is-info";
+                        }
+
+                        return "button is-warning";
+                    },
                 },
             },
         },
@@ -60,8 +70,20 @@ export default new Vuex.Store({
         },
 
         instanceData(state, getters) {
-            return (key, path, def) => {
-                return find(state.instances, `${key}.${path}`, def);
+            return (name, id, path, def) => {
+                let key = `${name}#${id}`;
+
+                let data    = find(state.instances, key, {});
+                let getters = find(state.components, `${name}.getters`, {});
+                let getter  = find(getters, path);
+
+                // Trying in state if no getter found
+                if (! getter) {
+                    return find(data, path, def);
+                }
+
+                // Trying in getters
+                return getter(data, getters);
             };
         },
     },
@@ -116,7 +138,7 @@ export default new Vuex.Store({
             }
 
             let component = state.components[componentName];
-            let instance  = Object.assign({}, component.data);
+            let instance  = Object.assign({}, component.state);
 
             let instanceKey = `${componentName}#${instanceId}`;
 

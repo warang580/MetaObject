@@ -15,20 +15,16 @@ export default {
         return {
             // Render function
             rendering: null,
-
-            // Removing conflicts because Vue.compile calls created()
-            compiling: false,
         };
     },
 
     created() {
-        console.log("created", this.for);
         this.$store.commit('create', this);
     },
 
     render(h) {
         if (! this.rendering) {
-            return h('h1', 'loading...');
+            return h('h1', 'rendering...');
         }
 
         return this.rendering();
@@ -60,7 +56,7 @@ export default {
         }),
 
         get(name, def) {
-            return this.getInstanceData()(this.key, name, def);
+            return this.getInstanceData()(this.for, this.id, name, def);
         },
 
         send(message, payload) {
@@ -94,7 +90,6 @@ export default {
         'component.template': {
             immediate: true,
             handler() {
-                console.log("template has changed");
                 this.render();
             },
         },
