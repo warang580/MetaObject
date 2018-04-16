@@ -11,6 +11,12 @@ export default new Vuex.Store({
 
     state: {
         components: {
+            stage: {
+                template: `<div class='stage'>
+                    <meta-component for="counter"></meta-component>
+                </div>`,
+            },
+
             counter: {
                 template: `<div class='meta'>
                     <button class="button is-info" @click="send('increment')" v-text="get('count', -1)"></button>
@@ -35,6 +41,8 @@ export default new Vuex.Store({
         },
 
         instances: {},
+
+        compiling: false,
     },
 
     // getter(state, getters)
@@ -67,7 +75,7 @@ export default new Vuex.Store({
             let action    = component.actions[message];
 
             // Call component method with correct context
-            console.log("send", `to: ${componentName}#${instanceId}`, `msg: ${message}`, "args:", payload);
+            console.log("sendTo:", `${componentName}#${instanceId}`, `msg: ${message}`, "args:", payload);
 
             let subContext = Object.assign({}, context);
 
@@ -89,7 +97,12 @@ export default new Vuex.Store({
             };
 
             action(subContext, payload);
-        }
+        },
+
+        update({ commit }, {componentName, component})
+        {
+            commit('updateComponent', {componentName, component});
+        },
     },
 
     mutations: {
@@ -105,23 +118,28 @@ export default new Vuex.Store({
             let component = state.components[componentName];
             let instance  = Object.assign({}, component.data);
 
-            let key = `${componentName}#${instanceId}`;
+            let instanceKey = `${componentName}#${instanceId}`;
 
-            Vue.set(state.instances, key, instance);
+            Vue.set(state.instances, instanceKey, instance);
         },
 
         // Update the state of an instance
         update(state, {componentName, instanceId, instance, callback}) {
-            // @TODO: remove .data ?
-            let key = `${componentName}#${instanceId}`;
-
-            let currentInstance = state.instances[key];
+            let instanceKey     = `${componentName}#${instanceId}`;
+            let currentInstance = state.instances[instanceKey];
 
             callback(currentInstance);
 
-            console.log("update", key, currentInstance);
+            Vue.set(state.instances, instanceKey, currentInstance);
+        },
 
-            Vue.set(state.instances, key, currentInstance);
+        updateComponent(state, {componentName, component}) {
+            console.log("updateComponent", componentName, component);
+            Vue.set(state.components, componentName, component);
+        },
+
+        compiling(state, status) {
+            state.compiling = status;
         },
     },
 });

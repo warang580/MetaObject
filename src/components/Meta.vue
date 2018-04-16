@@ -6,7 +6,7 @@ export default {
     props: {
         // The component we're "tranforming" into
         for: {
-            type:     String,
+            type: String,
             required: true,
         },
     },
@@ -15,15 +15,15 @@ export default {
         return {
             // Render function
             rendering: null,
+
+            // Removing conflicts because Vue.compile calls created()
+            compiling: false,
         };
     },
 
     created() {
+        console.log("created", this.for);
         this.$store.commit('create', this);
-
-        this.$bus.$emit(this.key, {
-            method: 'created',
-        });
     },
 
     render(h) {
@@ -91,9 +91,10 @@ export default {
     },
 
     watch: {
-        template: {
+        'component.template': {
             immediate: true,
             handler() {
+                console.log("template has changed");
                 this.render();
             },
         },
