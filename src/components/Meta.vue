@@ -35,16 +35,16 @@ export default {
     },
 
     computed: {
-        key() {
-            return `${this.for}#${this.id}`;
-        },
-
         id() {
             return this._uid;
         },
 
+        key() {
+            return `${this.for}#${this.id}`;
+        },
+
         instance() {
-            return this.getInstance()(this.for, this.id);
+            return this.getInstance()(this.key);
         },
 
         component() {
@@ -60,7 +60,7 @@ export default {
         }),
 
         get(name, def) {
-            return this.getInstanceData()(this.for, this.id, name, def);
+            return this.getInstanceData()(this.key, name, def);
         },
 
         send(message, payload) {

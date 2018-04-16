@@ -41,19 +41,19 @@ export default new Vuex.Store({
     getters: {
         component(state, getters) {
             return (name) => {
-                return find(state.components, `${name}`, {});
+                return find(state.components, name, {});
             };
         },
 
         instance(state, getters) {
-            return (name, id) => {
-                return find(state.instances, `${name}.${id}`, {});
+            return (key) => {
+                return find(state.instances, key, {});
             };
         },
 
         instanceData(state, getters) {
-            return (name, id, key, def) => {
-                return find(state.instances, `${name}.${id}.${key}`, def);
+            return (key, path, def) => {
+                return find(state.instances, `${key}.${path}`, def);
             };
         },
     },
@@ -105,21 +105,23 @@ export default new Vuex.Store({
             let component = state.components[componentName];
             let instance  = Object.assign({}, component.data);
 
-            console.log("create", `${componentName}#${instanceId}`, instance);
+            let key = `${componentName}#${instanceId}`;
 
-            state.instances[componentName][instanceId] = instance;
+            Vue.set(state.instances, key, instance);
         },
 
         // Update the state of an instance
         update(state, {componentName, instanceId, instance, callback}) {
             // @TODO: remove .data ?
-            let currentInstance = state.instances[componentName][instanceId];
+            let key = `${componentName}#${instanceId}`;
+
+            let currentInstance = state.instances[key];
 
             callback(currentInstance);
 
-            console.log("update", `${componentName}#${instanceId}`, currentInstance);
+            console.log("update", key, currentInstance);
 
-            state.instances[componentName][instanceId] = currentInstance;
+            Vue.set(state.instances, key, currentInstance);
         },
     },
 });
