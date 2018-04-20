@@ -4,7 +4,7 @@
             Components:
 
             <button v-for="component in components"
-                :class="'button ' + (editing == component.name ? 'is-active':'')"
+                :class="'button ' + (editing == component.name ? 'is-active is-primary':'is-info')"
                 v-text="component.name"
                 @click="edit(component.name)"
             ></button>
