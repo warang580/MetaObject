@@ -27,7 +27,7 @@ export default {
     },
 
     created() {
-        this.$store.commit('create', this);
+        this.$store.commit('instantiate', this);
 
         this.emit('created', this.key);
     },

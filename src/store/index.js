@@ -14,13 +14,14 @@ export default new Vuex.Store({
         components: {
             stage: {
                 template: `<div class='stage'>
-                    Total: <span v-text="get('total')"></span>
+                    <div>Total: <span v-text="get('total')"></span></div>
                     <meta-component v-for="n in get('nb')" :key="n" @changed="send('update', {index: n, value: $event})" for="counter"></meta-component>
                     <meta-component for="light"></meta-component>
+                    <meta-component for="discussion"></meta-component>
                 </div>`,
 
                 state: {
-                    nb: 5,
+                    nb:  3,
                     sub: [0, 0],
                 },
 
@@ -70,7 +71,7 @@ export default new Vuex.Store({
                     },
 
                     css(state, getters) {
-                        return state.on ? "button is-warning" : "button";
+                        return state.on ? "button is-danger" : "button is-info";
                     },
                 },
             },
@@ -120,6 +121,59 @@ export default new Vuex.Store({
                     },
                 },
             },
+
+            discussion: {
+                template: `<div class='chat'>
+                    <div class="discussion">
+                        <article class="message"
+                            v-for="message in get('messages', [])">
+                            <div class="message-body" v-text="message"></div>
+                        </article>
+                    </div>
+                    <div class="controls">
+                        <div class="field has-addons">
+                            <div class="control">
+                                <input class="input" type="text" placeholder="Enter a message" :value="get('text')" @input="send('update', $event)">
+                            </div>
+                            <div class="control">
+                                <button class="button is-info" @keyup.enter="send('send')" @click="send('send')">
+                                  Send
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>`,
+
+                state: {
+                    messages: ['this is a first message', 'second one'],
+                    text: '',
+                },
+
+                actions: {
+                    update({ commit }, $event) {
+                        let value = $event.target.value;
+
+                        commit('update', value);
+                    },
+
+                    send({ state, commit }, payload) {
+                        if (state.text != "") {
+                            commit('send');
+                        }
+                    },
+                },
+
+                mutations: {
+                    update(state, text) {
+                        state.text = text;
+                    },
+
+                    send(state) {
+                        state.messages.push(state.text);
+                        state.text = "";
+                    },
+                },
+            },
         },
 
         // Instances data
@@ -127,6 +181,8 @@ export default new Vuex.Store({
 
         // Instances events/bus
         events: {},
+
+        debug: false,
     },
 
     // getter(state, getters)
@@ -181,7 +237,9 @@ export default new Vuex.Store({
         // [Example: execute "increment" in a "counter" instance]
         send(context, { componentName, instanceId, message, payload })
         {
-            console.log("send:", message, `to: ${componentName}#${instanceId}`, "args:", payload);
+            if (context.state.debug) {
+                console.log("send:", message, `to: ${componentName}#${instanceId}`, "args:", payload);
+            }
 
             // Get component action
             // [counter.increment callback]
@@ -226,6 +284,17 @@ export default new Vuex.Store({
             action(subContext, payload);
         },
 
+        // Create a base component
+        create({ commit }, {componentName}) {
+            console.log("create", componentName);
+
+            let component = {
+                template: `<div>${componentName}</div>`,
+            };
+
+            commit('update', {componentName, component});
+        },
+
         // Update component
         update({ commit }, {componentName, component}) {
             // @NOTE: using action if case of expanding code / logs
@@ -240,7 +309,7 @@ export default new Vuex.Store({
         },
 
         // Create an instance of a component `new component`
-        create(state, self) {
+        instantiate(state, self) {
             let componentName = self.for;
             let instanceId    = self.id;
 
