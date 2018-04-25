@@ -11,9 +11,8 @@ http://worrydream.com/LearnableProgramming/
 
 ## Roadmap
 
-- Handle components data/actions with UI
 - Handle props for data
-- Handle component template with a UI with boxes and data (el, attrs, childrens - like render)
+- Use BLOCKLY to handle components templates/data/actions
 
 ## BUGS
 
