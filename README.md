@@ -9,6 +9,10 @@ Goals : Collect / Explore / Communicate
 http://worrydream.com/DrawingDynamicVisualizationsTalkAddendum/
 http://worrydream.com/LearnableProgramming/
 
+https://www.techagekids.com/2016/07/graphical-vs-text-based-coding-for-kids.html
+https://www.getready.io/learn/
+http://www.twistedsquare.com/Frame-Based-Editing.pdf
+
 ## Roadmap
 
 - Handle props for data
